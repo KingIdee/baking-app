@@ -1,13 +1,14 @@
 package com.idee.bakingapp;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
 
     SimpleExoPlayer exoPlayer;
     SimpleExoPlayerView exoPlayerView;
-    ImageButton forwardButton, backwardButton;
+    Button backwardButton, forwardButton;
     ArrayList<StepModel> arrayList = new ArrayList<>();
 
     TextView textView;
@@ -56,6 +57,7 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
     void bindNewDetails(){
 
         textView.setText(arrayList.get(currentPosition).getDescription());
+        initializePlayer(Uri.parse(arrayList.get(currentPosition).getVideoURL()));
 
     }
 
@@ -84,10 +86,12 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
         exoPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.ep_video_instruction);
         //exoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(),null));
 
+        initializeMediaSession();
+
         bindNewDetails();
 
-        forwardButton = (ImageButton) view.findViewById(R.id.ib_forward);
-        backwardButton = (ImageButton) view.findViewById(R.id.ib_backward);
+        forwardButton = (Button) view.findViewById(R.id.ib_forward);
+        backwardButton = (Button) view.findViewById(R.id.ib_backward);
 
         backwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,8 +110,9 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
             @Override
             public void onClick(View v) {
                 if (currentPosition!=maxPosition){
-                    bindNewDetails();
                     currentPosition++;
+                    bindNewDetails();
+
                 }
                 else
                     Toast.makeText(getActivity(), "You cannot move further", Toast.LENGTH_SHORT).show();
@@ -139,6 +144,55 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+    }
+
+    private void releasePlayer(){
+        exoPlayer.stop();
+        exoPlayer.release();
+        exoPlayer = null;
+    }
+
+
+    private MediaSessionCompat mMediaSession;
+    private PlaybackStateCompat.Builder mStateBuilder;
+
+    private void initializeMediaSession() {
+
+        // Create a MediaSessionCompat.
+        mMediaSession = new MediaSessionCompat(getActivity(), "TAG");
+
+        // Enable callbacks from MediaButtons and TransportControls.
+        mMediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        // Do not let MediaButtons restart the player when the app is not visible.
+        mMediaSession.setMediaButtonReceiver(null);
+
+        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+
+
+        // MySessionCallback has methods that handle callbacks from a media controller.
+        mMediaSession.setCallback(new MySessionCallback());
+
+        // Start the Media Session since the activity is active.
+        mMediaSession.setActive(true);
+
+    }
+
+
+    @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
@@ -156,6 +210,15 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 
+        if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                    exoPlayer.getCurrentPosition(), 1f);
+        } else if((playbackState == ExoPlayer.STATE_READY)){
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    exoPlayer.getCurrentPosition(), 1f);
+        }
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+
     }
 
     @Override
@@ -167,4 +230,22 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
     public void onPositionDiscontinuity() {
 
     }
+
+    private class MySessionCallback extends MediaSessionCompat.Callback {
+        @Override
+        public void onPlay() {
+            exoPlayer.setPlayWhenReady(true);
+        }
+
+        @Override
+        public void onPause() {
+            exoPlayer.setPlayWhenReady(false);
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            exoPlayer.seekTo(0);
+        }
+    }
+
 }

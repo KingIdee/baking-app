@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,6 +35,9 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
     RecipesAdapter adapter;
     ProgressBar progressBar;
 
+    Button refreshButton;
+    TextView errorText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,15 +48,27 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
         mRecipes = (RecyclerView) findViewById(R.id.rv_recipes);
         progressBar = (ProgressBar) findViewById(R.id.pb_recipes_loading);
         progressBar.setVisibility(View.INVISIBLE);
+        errorText = (TextView) findViewById(R.id.tv_error_message);
+        refreshButton = (Button) findViewById(R.id.bt_refresh);
 
-        /*if (findViewById(R.id.tablet_view)!=null) {
+        initalState();
+
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
+                showResponse();
+                fetchResponse();
+            }
+        });
+
+        if (findViewById(R.id.view_tablet) != null) {
             //tablet
-            mRecipes.setLayoutManager(new GridLayoutManager(this,3));
-        } else*/
+            mRecipes.setLayoutManager(new GridLayoutManager(this, 3));
+        } else
+            mRecipes.setLayoutManager(new GridLayoutManager(this, 1));
 
-        mRecipes.setLayoutManager(new GridLayoutManager(this, 1)/*new LinearLayoutManager(this)*/);
-
-        adapter = new RecipesAdapter(this,this);
+        adapter = new RecipesAdapter(this, this);
         mRecipes.setAdapter(adapter);
 
         fetchResponse();
@@ -107,18 +124,30 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
         } else {
 
             //progressBar.setVisibility(View.INVISIBLE);
+            showError();
+            errorText.setText("No internet connection");
             Toast.makeText(RecipesActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
 
         }
 
     }
 
+    private void initalState(){
+        progressBar.setVisibility(View.VISIBLE);
+        refreshButton.setVisibility(View.INVISIBLE);
+        errorText.setVisibility(View.INVISIBLE);
+    }
+
     private void showError() {
         progressBar.setVisibility(View.INVISIBLE);
+        refreshButton.setVisibility(View.VISIBLE);
+        errorText.setVisibility(View.VISIBLE);
     }
 
     private void showResponse() {
         progressBar.setVisibility(View.INVISIBLE);
+        refreshButton.setVisibility(View.INVISIBLE);
+        errorText.setVisibility(View.INVISIBLE);
     }
 
     private void parseJson(String response) {
@@ -142,7 +171,7 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
 
                     IngredientModel ingredientModel = new IngredientModel();
                     ingredientModel.setIngredient(object1.getString("ingredient"));
-                    Log.d(LOG_TAG+String.valueOf(j),object1.getString("ingredient"));
+                    Log.d(LOG_TAG + String.valueOf(j), object1.getString("ingredient"));
                     ingredientModel.setMeasure(object1.getString("measure"));
                     ingredientModel.setQuantity(object1.getString("quantity"));
 
@@ -161,7 +190,7 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
                     StepModel stepModel = new StepModel();
                     stepModel.setDescription(object1.getString("description"));
                     stepModel.setShortDescription(object1.getString("shortDescription"));
-                    Log.d(LOG_TAG+"2",object1.getString("shortDescription"));
+                    Log.d(LOG_TAG + "2", object1.getString("shortDescription"));
                     stepModel.setVideoURL(object1.getString("videoURL"));
                     stepModel.setThumbnailURL(object1.getString("thumbnailURL"));
 
@@ -187,8 +216,8 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
     //adapter click
     @Override
     public void recyclerOnClick(int position) {
-        Intent intent = new Intent(RecipesActivity.this,RecipeDetailView.class);
-        intent.putExtra(EXTRA_RECIPE_MODEL,arrayList.get(position));
+        Intent intent = new Intent(RecipesActivity.this, RecipeDetailView.class);
+        intent.putExtra(EXTRA_RECIPE_MODEL, arrayList.get(position));
         startActivity(intent);
     }
 }

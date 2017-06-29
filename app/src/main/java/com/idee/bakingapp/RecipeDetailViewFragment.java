@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static com.idee.bakingapp.RecipeDetailView.twoPane;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -46,7 +48,7 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
         recyclerView.addItemDecoration(mDividerItemDecoration);
 
         ArrayList<IngredientModel> ingredientModel = model.getIngredientModelArrayList();
-        TextView ingredients = (TextView) view.findViewById(R.id.tv_ingredients);
+        //TextView ingredients = (TextView) view.findViewById(R.id.tv_ingredients);
         String ing="";
 
         for (int i = 0; i<ingredientModel.size();i++){
@@ -55,7 +57,7 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
 
         }
 
-        ingredients.setText(ing);
+        //ingredients.setText(ing);
 
         adapter.setStepModel(model.getStepModelArrayList());
         recyclerView.setAdapter(adapter);
@@ -66,11 +68,30 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
     @Override
     public void recyclerOnClick(int position) {
         //TODO: start StepDetailView Activity
-        Intent intent = new Intent(getActivity(),StepDetailView.class);
-        //intent.putExtra(EXTRA_STEP_MODEL,model.getStepModelArrayList().get(position));
-        intent.putExtra(EXTRA_STEP_MODEL,model.getStepModelArrayList());
-        intent.putExtra(POSITION,position);
-        startActivity(new Intent(intent));
+
+        if (twoPane){
+
+            StepDetailViewFragment fragment = new StepDetailViewFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList(EXTRA_STEP_MODEL,model.getStepModelArrayList());
+            bundle.putInt(POSITION,position);
+            fragment.setArguments(bundle);
+
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fl_tablet_recipe_detail_view,fragment)
+                    .commit();
+
+
+        } else {
+            Intent intent = new Intent(getActivity(),StepDetailView.class);
+            //intent.putExtra(EXTRA_STEP_MODEL,model.getStepModelArrayList().get(position));
+            intent.putExtra(EXTRA_STEP_MODEL,model.getStepModelArrayList());
+            intent.putExtra(POSITION,position);
+            startActivity(new Intent(intent));
+        }
+
+
+
     }
 
 }
