@@ -1,5 +1,7 @@
 package com.idee.bakingapp;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -74,28 +76,6 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
         fetchResponse();
 
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     private void fetchResponse() {
 
@@ -200,7 +180,6 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
 
                 model.setStepModelArrayList(stepArrayList);
 
-
                 arrayList.add(model);
 
             } // end of  for-loop for populate the arrayList
@@ -218,6 +197,10 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
     public void recyclerOnClick(int position) {
         Intent intent = new Intent(RecipesActivity.this, RecipeDetailView.class);
         intent.putExtra(EXTRA_RECIPE_MODEL, arrayList.get(position));
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int [] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipesActivity.class));
+
+        //NewAppWidget.updateAppWidget(this,appWidgetManager,arrayList.get(position),appWidgetIds);
         startActivity(intent);
     }
 }

@@ -42,7 +42,6 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
 
     private static final java.lang.String CURRENT_POSITION = "position";
 
-    public StepDetailViewFragment() {}
 
     int currentPosition;
     int maxPosition;
@@ -54,12 +53,10 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
 
     TextView textView;
 
-    void bindNewDetails(){
+    private MediaSessionCompat mMediaSession;
+    private PlaybackStateCompat.Builder mStateBuilder;
 
-        textView.setText(arrayList.get(currentPosition).getDescription());
-        initializePlayer(Uri.parse(arrayList.get(currentPosition).getVideoURL()));
-
-    }
+    public StepDetailViewFragment() {}
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -101,7 +98,7 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
                     bindNewDetails();
                 }
                 else
-                    Toast.makeText(getActivity(), "You cant go back again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "You have reached the beginning ", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -115,13 +112,31 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
 
                 }
                 else
-                    Toast.makeText(getActivity(), "You cannot move further", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "You have reached the end", Toast.LENGTH_SHORT).show();
             }
         });
 
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        releasePlayer();
+    }
+
+    private void releasePlayer(){
+        exoPlayer.stop();
+        exoPlayer.release();
+        exoPlayer = null;
+    }
+
+    private void bindNewDetails(){
+
+        textView.setText(arrayList.get(currentPosition).getDescription());
+        initializePlayer(Uri.parse(arrayList.get(currentPosition).getVideoURL()));
+
+    }
 
     private void initializePlayer(Uri mediaUri) {
         if (exoPlayer == null) {
@@ -142,22 +157,6 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
             exoPlayer.setPlayWhenReady(true);
         }
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-    }
-
-    private void releasePlayer(){
-        exoPlayer.stop();
-        exoPlayer.release();
-        exoPlayer = null;
-    }
-
-
-    private MediaSessionCompat mMediaSession;
-    private PlaybackStateCompat.Builder mStateBuilder;
 
     private void initializeMediaSession() {
 
