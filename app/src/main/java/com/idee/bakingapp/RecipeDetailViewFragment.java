@@ -2,6 +2,8 @@ package com.idee.bakingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +31,7 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
     private RecipeDetailViewAdapter adapter;
     RecyclerView recyclerView;
     RecipeModel model;
+    ArrayList<IngredientModel> ingredientModel = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +50,7 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(mDividerItemDecoration);
 
-        ArrayList<IngredientModel> ingredientModel = model.getIngredientModelArrayList();
+        ingredientModel = model.getIngredientModelArrayList();
         //TextView ingredients = (TextView) view.findViewById(R.id.tv_ingredients);
         String ing="";
 

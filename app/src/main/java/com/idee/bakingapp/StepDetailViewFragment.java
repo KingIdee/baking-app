@@ -42,7 +42,6 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
 
     private static final java.lang.String CURRENT_POSITION = "position";
 
-
     int currentPosition;
     int maxPosition;
 
@@ -134,6 +133,7 @@ public class StepDetailViewFragment extends Fragment implements ExoPlayer.EventL
     private void bindNewDetails(){
 
         textView.setText(arrayList.get(currentPosition).getDescription());
+        releasePlayer();
         initializePlayer(Uri.parse(arrayList.get(currentPosition).getVideoURL()));
 
     }

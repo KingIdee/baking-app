@@ -23,7 +23,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class RecipesActivityTest {
+
+public class RecipeDetailActivityTest {
 
     IdlingResource idlingResource;
 
@@ -34,18 +35,26 @@ public class RecipesActivityTest {
     }
 
     //@Rule public ActivityTestRule<RecipesActivity> activityTestRule = new ActivityTestRule<>(RecipesActivity.class);
-    @Rule public IntentsTestRule<RecipesActivity> activityTestRule = new IntentsTestRule<>(RecipesActivity.class);
+    @Rule
+    public IntentsTestRule<RecipeDetailView> activityTestRule = new IntentsTestRule<>(RecipeDetailView.class);
 
+    // i am yet to run this test
     @Test
-    public void openRecipeDetailActivity(){
+    public void openStepDetailView(){
         //onView(withId(R.id.rv_recipes)).perform(click());
 
         //perform click on the recycler view
-        onView(withId(R.id.rv_recipes))
+        onView(withId(R.id.rv_steps))
                 .perform(actionOnItemAtPosition(0, click()));
 
-        // check if the intent is starts the class RecipeDetailView
-        intended(hasComponent(RecipeDetailView.class.getName()));
+        // check if the intent is starts the class StepDetailView
+        intended(hasComponent(StepDetailView.class.getName()));
+
+    }
+
+    @Test
+    public void recyclerviewNotEmpty(){
+        //assertThat();
 
     }
 

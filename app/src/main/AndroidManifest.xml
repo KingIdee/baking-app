@@ -25,6 +25,7 @@
         </activity>
         <activity
             android:name=".RecipeDetailView"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_recipe_detail_view" />
         <activity
             android:name=".StepDetailView"
