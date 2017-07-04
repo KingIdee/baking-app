@@ -2,13 +2,11 @@ package com.idee.bakingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,27 +40,30 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
 
         recyclerView = (RecyclerView) view.findViewById(R.id.rv_steps);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.scrollToPosition(0);
         adapter = new RecipeDetailViewAdapter(getActivity(),this);
 
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(mDividerItemDecoration);
 
-        ingredientModel = model.getIngredientModelArrayList();
-        //TextView ingredients = (TextView) view.findViewById(R.id.tv_ingredients);
         String ing="";
 
-        for (int i = 0; i<ingredientModel.size();i++){
-            //String ingredient, quantity, measure;
-            ing = ing+"\n"+ingredientModel.get(i).getIngredient()+", "+ingredientModel.get(i).getQuantity()+", "+ingredientModel.get(i).getMeasure();
+        TextView ingredients = (TextView) view.findViewById(R.id.tv_ingredients);
 
+        if (model!=null) {
+            ingredientModel = model.getIngredientModelArrayList();
+            adapter.setStepModel(model.getStepModelArrayList());
+            for (int i = 0; i < ingredientModel.size(); i++) {
+                //String ingredient, quantity, measure;
+                ing = ing + "\n" + ingredientModel.get(i).getIngredient() + ", " + ingredientModel.get(i).getQuantity() + ", " + ingredientModel.get(i).getMeasure();
+
+            }
         }
+        ingredients.setText(ing);
 
-        //ingredients.setText(ing);
-
-        adapter.setStepModel(model.getStepModelArrayList());
         recyclerView.setAdapter(adapter);
 
         return view;
@@ -84,7 +85,6 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
                     .replace(R.id.fl_tablet_recipe_detail_view,fragment)
                     .commit();
 
-
         } else {
             Intent intent = new Intent(getActivity(),StepDetailView.class);
             //intent.putExtra(EXTRA_STEP_MODEL,model.getStepModelArrayList().get(position));
@@ -92,8 +92,6 @@ public class RecipeDetailViewFragment extends Fragment implements AdapterClickLi
             intent.putExtra(POSITION,position);
             startActivity(new Intent(intent));
         }
-
-
 
     }
 

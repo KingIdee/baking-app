@@ -48,7 +48,7 @@ public class RecipeDetailViewAdapter extends RecyclerView.Adapter<RecipeDetailVi
         if (model.getThumbnailURL()!=null)
         Picasso.with(context)
                 .load("http://image.tmdb.org/t/p/w185/" + model.getThumbnailURL())
-                .error(R.drawable.no_image)
+                //.error(R.drawable.no_image)
                 //.placeholder(R.drawable.ic_info_black_24dp)
                 .into(holder.imageView);
 

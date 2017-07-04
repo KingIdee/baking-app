@@ -26,8 +26,9 @@ public class RecipeDetailView extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getIdlingResource();
         setContentView(R.layout.activity_recipe_detail_view);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         twoPane = findViewById(R.id.fl_tablet_recipe_detail_view) != null;
 
     }

@@ -2,6 +2,7 @@ package com.idee.bakingapp;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,19 +95,6 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
         mRecipes.setAdapter(adapter);
 
         fetchResponse();
-
-    }
-
-    public void forWidget(){
-
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        int [] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipesActivity.class));
-
-        NewAppWidget.customUpdate(this,
-                appWidgetManager,
-                arrayList.get(0).getName(),
-                arrayList.get(0).getIngredientModelArrayList(),
-                appWidgetIds);
 
     }
 
@@ -230,16 +219,26 @@ public class RecipesActivity extends AppCompatActivity implements AdapterClickLi
     public void recyclerOnClick(int position) {
         Intent intent = new Intent(RecipesActivity.this, RecipeDetailView.class);
         intent.putExtra(EXTRA_RECIPE_MODEL, arrayList.get(position));
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        int [] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipesActivity.class));
+        String message = arrayList.get(position).getName() +"'s ingredients include: \n" ;
+        ArrayList<IngredientModel> ingredientModelArrayList = arrayList.get(position).getIngredientModelArrayList();
 
-        NewAppWidget.customUpdate(this,
-                appWidgetManager,
-                arrayList.get(position).getName(),
-                arrayList.get(position).getIngredientModelArrayList(),
-                appWidgetIds);
+        for (int i=0;i<ingredientModelArrayList.size();i++){
+            IngredientModel model = ingredientModelArrayList.get(i);
+            message = message + i+1+" "+model.getIngredient()+" ";
+        }
 
-        //NewAppWidget.updateAppWidget(this,appWidgetManager,arrayList.get(position),appWidgetIds);
+        updateWidget(message);
         startActivity(intent);
+    }
+
+    private void updateWidget(String message) {
+
+        Context context = RecipesActivity.this;
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        ComponentName thisWidget = new ComponentName(context, NewAppWidget.class);
+        remoteViews.setTextViewText(R.id.appwidget_text, message + System.currentTimeMillis());
+        appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+
     }
 }

@@ -25,8 +25,12 @@
         </activity>
         <activity
             android:name=".RecipeDetailView"
-            android:launchMode="singleTop"
-            android:label="@string/title_activity_recipe_detail_view" />
+            android:label="@string/title_activity_recipe_detail_view"
+            android:launchMode="singleTop" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.idee.bakingapp.RecipesActivity" />
+        </activity>
         <activity
             android:name=".StepDetailView"
             android:label="@string/title_activity_step_detail_view"
@@ -45,6 +49,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
+
     </application>
 
 </manifest>
